@@ -7,8 +7,10 @@
 
 package org.usfirst.frc.team2905.robot;
 
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -31,7 +33,12 @@ public class Robot extends IterativeRobot {
 	VictorSP rearLeft;
 	VictorSP frontRight;
 	VictorSP rearRight;
+	VictorSP armMechanismUpDownMotor;
+	VictorSP rightLiftMotor;
+	VictorSP leftLiftMotor;
 	RobotDrive myRobot;
+	DigitalOutput rightArmValve ;
+	DigitalOutput leftArmValve ;
 	Joystick stick;
 	Joystick gamepad;
 	JoystickButton button1;
@@ -47,7 +54,15 @@ public class Robot extends IterativeRobot {
 		rearLeft = new VictorSP(6);
 		frontRight = new VictorSP(9);
 		rearRight = new VictorSP(8);
-		myRobot = new RobotDrive(frontLeft, rearLeft, frontRight, rearRight);
+		armMechanismUpDownMotor = new VictorSP(5);
+		rightLiftMotor = new VictorSP(4);
+		leftLiftMotor = new VictorSP(3);
+		rightArmValve = new DigitalOutput(0);
+		leftArmValve = new DigitalOutput(1);
+		myRobot = new RobotDrive(rearRight ,frontRight, rearLeft , frontLeft );
+		//myRobot.setInvertedMotor(RobotDrive.frontLeft, true);
+		//myRobot.setInvertedMotor(RobotDrive.rearLeft, true);
+		
 		stick = new Joystick(0);
 		gamepad = new Joystick(1);
 		
@@ -93,7 +108,63 @@ public class Robot extends IterativeRobot {
 		}*/
 		
 		myRobot.arcadeDrive(stick);
+		
 		//myRobot.arcadeDrive(0.5, 0.0);
+		
+		//***** Arm Mechanism Up/Down Motor - GamePad Button 3 and 4 *****//
+		
+		//Up
+		if(gamepad.getRawButton(4)== true && gamepad.getRawButton(3) == false)
+		{
+			armMechanismUpDownMotor.set(0.1);
+		}
+		
+		//Down
+		else if(gamepad.getRawButton(3)== true && gamepad.getRawButton(4) == false)
+		{
+			armMechanismUpDownMotor.set(-0.1);
+		}
+		else{
+			armMechanismUpDownMotor.stopMotor();
+		}
+		
+		//***** Lift Mechanism Up/Down Motor - GamePad Button 1 and 2 *****//
+		
+				//Up
+				if(gamepad.getRawButton(2)== true && gamepad.getRawButton(1) == false)
+				{
+					rightLiftMotor.set(0.1);
+					leftLiftMotor.set(-0.1);
+				}
+				
+				//Down
+				else if(gamepad.getRawButton(1)== true && gamepad.getRawButton(2) == false)
+				{
+					rightLiftMotor.set(-0.1);
+					leftLiftMotor.set(0.1);
+				}
+				else{
+					
+					rightLiftMotor.stopMotor();
+					leftLiftMotor.stopMotor();
+				}
+				
+				//***** Arm Open/Close - GamePad Button 5 and 6 *****//
+				
+				//Up
+				if(gamepad.getRawButton(5)== true && gamepad.getRawButton(6) == false)
+				{
+					rightArmValve.set(true);
+					leftArmValve.set(true);
+				}
+				
+				//Down
+				
+				else{
+					
+					rightArmValve.set(false);
+					leftArmValve.set(false);
+				}
 		
 		
 	}
