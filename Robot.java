@@ -7,7 +7,11 @@
 
 package org.usfirst.frc.team2905.robot;
 
+import com.sun.prism.paint.Color;
+
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Relay;
@@ -59,12 +63,14 @@ public class Robot extends IterativeRobot {
 		leftLiftMotor = new VictorSP(3);
 		rightArmValve = new DigitalOutput(0);
 		leftArmValve = new DigitalOutput(1);
-		myRobot = new RobotDrive(rearRight ,frontRight, rearLeft , frontLeft );
+		myRobot = new RobotDrive(rearLeft, frontLeft, rearRight, frontRight);
 		//myRobot.setInvertedMotor(RobotDrive.frontLeft, true);
 		//myRobot.setInvertedMotor(RobotDrive.rearLeft, true);
 		
 		stick = new Joystick(0);
 		gamepad = new Joystick(1);
+		Alliance color;
+		color = DriverStation.getInstance().getAlliance();
 		
 		
 	}
@@ -74,19 +80,55 @@ public class Robot extends IterativeRobot {
 	 */
 	public void autonomousInit() {
 		autoLoopCounter = 0;
+		
+		// Getting Team Color
+		Alliance color;
+		color = DriverStation.getInstance().getAlliance(); 
+		
+		if(color == DriverStation.Alliance.Blue)
+		{
+			int a = 1;
+		}
+		else
+		{
+			int aa=2;
+		}
+		//Getting Location Number
+		
 	}
 
 	/**
 	 * This function is called periodically during autonomous
 	 */
 	public void autonomousPeriodic() {
-		if(autoLoopCounter < 100) //Check if we've completed 100 loops (approximately 2 seconds)
+		
+		while(isAutonomous() && isEnabled())
 		{
-			myRobot.drive(-0.5, 0.0); 	// drive forwards half speed
-			autoLoopCounter++;
-		} else {
-			myRobot.drive(0.0, 0.0); 	// stop robot
+			
+			String gameData;
+			gameData = DriverStation.getInstance().getGameSpecificMessage();
+			
+			if(gameData.length()>0)
+			{
+				if(gameData.charAt(0) == 'L')
+				{
+					if(autoLoopCounter < 300) //Check if we've completed 100 loops (approximately 2 seconds)
+					{
+						leftLiftMotor.set(-0.5); 	// drive forwards half speed
+						autoLoopCounter++;
+					} else {
+						leftLiftMotor.set(0.0); 
+						
+					}				}
+				else
+				{
+					leftLiftMotor.set(0.0);
+				}
+			}
+			
+			
 		}
+		
 	}
 
 	/**
@@ -99,72 +141,70 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during operator control
 	 */
 	public void teleopPeriodic() {
-		/**if(autoLoopCounter < 100) //Check if we've completed 100 loops (approximately 2 seconds)
+		
+		while(isOperatorControl() && isEnabled())
 		{
-			myRobot.drive(-0.5, 0.0); 	// drive forwards half speed
-			autoLoopCounter++;
-		} else {
-			myRobot.drive(0.0, 0.0); 	// stop robot
-		}*/
-		
-		myRobot.arcadeDrive(stick);
-		
-		//myRobot.arcadeDrive(0.5, 0.0);
-		
-		//***** Arm Mechanism Up/Down Motor - GamePad Button 3 and 4 *****//
-		
-		//Up
-		if(gamepad.getRawButton(4)== true && gamepad.getRawButton(3) == false)
-		{
-			armMechanismUpDownMotor.set(0.1);
-		}
-		
-		//Down
-		else if(gamepad.getRawButton(3)== true && gamepad.getRawButton(4) == false)
-		{
-			armMechanismUpDownMotor.set(-0.1);
-		}
-		else{
-			armMechanismUpDownMotor.stopMotor();
-		}
-		
-		//***** Lift Mechanism Up/Down Motor - GamePad Button 1 and 2 *****//
-		
-				//Up
-				if(gamepad.getRawButton(2)== true && gamepad.getRawButton(1) == false)
-				{
-					rightLiftMotor.set(0.1);
-					leftLiftMotor.set(-0.1);
-				}
-				
-				//Down
-				else if(gamepad.getRawButton(1)== true && gamepad.getRawButton(2) == false)
-				{
-					rightLiftMotor.set(-0.1);
-					leftLiftMotor.set(0.1);
-				}
-				else{
+			myRobot.arcadeDrive(stick);
+			
+			//myRobot.arcadeDrive(0.5, 0.0);
+			
+			//***** Arm Mechanism Up/Down Motor - GamePad Button 3 and 4 *****//
+			
+			//Up
+			if(gamepad.getRawButton(4)== true && gamepad.getRawButton(3) == false)
+			{
+				armMechanismUpDownMotor.set(0.1);
+			}
+			
+			//Down
+			else if(gamepad.getRawButton(3)== true && gamepad.getRawButton(4) == false)
+			{
+				armMechanismUpDownMotor.set(-0.1);
+			}
+			else{
+				armMechanismUpDownMotor.stopMotor();
+			}
+			
+			//***** Lift Mechanism Up/Down Motor - GamePad Button 1 and 2 *****//
+			
+					//Up
+					if(gamepad.getRawButton(2)== true && gamepad.getRawButton(1) == false)
+					{
+						rightLiftMotor.set(0.1);
+						leftLiftMotor.set(-0.1);
+					}
 					
-					rightLiftMotor.stopMotor();
-					leftLiftMotor.stopMotor();
-				}
-				
-				//***** Arm Open/Close - GamePad Button 5 and 6 *****//
-				
-				//Up
-				if(gamepad.getRawButton(5)== true && gamepad.getRawButton(6) == false)
-				{
-					rightArmValve.set(true);
-					leftArmValve.set(true);
-				}
-				
-				//Down
-				
-				else{
+					//Down
+					else if(gamepad.getRawButton(1)== true && gamepad.getRawButton(2) == false)
+					{
+						rightLiftMotor.set(-0.1);
+						leftLiftMotor.set(0.1);
+					}
+					else{
+						
+						rightLiftMotor.stopMotor();
+						leftLiftMotor.stopMotor();
+					}
 					
-					rightArmValve.set(false);
-					leftArmValve.set(false);
-				}
+					//***** Arm Open/Close - GamePad Button 5 and 6 *****//
+					
+					//Up
+					if(gamepad.getRawButton(5)== true && gamepad.getRawButton(6) == false)
+					{
+						rightArmValve.set(true);
+						leftArmValve.set(true);
+					}
+					
+					//Down
+					
+					else{
+						
+						rightArmValve.set(false);
+						leftArmValve.set(false);
+					}
+		}
+		
+		
 		
 		
 	}
